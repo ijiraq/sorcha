@@ -36,7 +36,7 @@ def PPReadPointingDatabase(bsdbname, observing_filters, dbquery, surveyname):
     # tasks try to read the same pointing database simultaneously even in read-only mode.
 
     attempt_reading_time = 0
-    while attempt_reading_time < 120:
+    while True:
         try:
             df = pd.read_sql_query(dbquery, con)
             break
@@ -44,6 +44,11 @@ def PPReadPointingDatabase(bsdbname, observing_filters, dbquery, surveyname):
             pplogger.error(
                 "ERROR: PPReadPointingDatabase: SQL query on pointing database failed. Check that the query is correct in the config file."
             )
+            if attempt_reading_time > 120:
+                sys.exit(
+                    "ERROR: PPReadPointingDatabase: SQL query on pointing database failed. Check that the query is correct in the config file."
+                )
+            
             delay_time = randint(20, 40)
             attempt_reading_time += delay_time
             sleep(delay_time)
