@@ -11,7 +11,11 @@ from sorcha.ephemeris.simulation_data_files import (
     OBSERVATORY_CODES_COMPRESSED,
     make_retriever,
 )
-from sorcha.ephemeris.orbit_conversion_utilities import universal_cartesian, universal_keplerian, principal_value
+from sorcha.ephemeris.orbit_conversion_utilities import (
+    universal_cartesian,
+    universal_keplerian,
+    principal_value,
+)
 
 
 def mjd_tai_to_epoch(mjd_tai):
@@ -160,7 +164,7 @@ def get_perihelion_row(row, epochJD_TDB, ephem, ssb_dict, gm_sun, gm_total):
     if epochJD_TDB not in ssb_dict:
         ssb_dict[epochJD_TDB] = ephem.get_particle("Sun", epochJD_TDB - ephem.jd_ref)
     ssb = ssb_dict[epochJD_TDB]
-    
+
     ssb_pos = -equatorial_to_ecliptic([ssb.x, ssb.y, ssb.z])
     ssb_vel = -equatorial_to_ecliptic([ssb.vx, ssb.vy, ssb.vz])
 
@@ -176,10 +180,10 @@ def get_perihelion_row(row, epochJD_TDB, ephem, ssb_dict, gm_sun, gm_total):
                 row["zdot"],
                 epochJD_TDB,
             )
-            inc *= 180/np.pi 
-            node *= 180/np.pi 
-            argPeri *= 180/np.pi 
-            Tp += - 2400000.5
+            inc *= 180 / np.pi
+            node *= 180 / np.pi
+            argPeri *= 180 / np.pi
+            Tp += -2400000.5
 
         elif orbit_format == "BCART":  # convert to helio here
             q, e, inc, node, argPeri, Tp = universal_keplerian(
@@ -192,20 +196,20 @@ def get_perihelion_row(row, epochJD_TDB, ephem, ssb_dict, gm_sun, gm_total):
                 row["zdot"] + ssb_vel[2],
                 epochJD_TDB,
             )
-            inc *= 180/np.pi 
-            node *= 180/np.pi 
-            argPeri *= 180/np.pi 
-            Tp += - 2400000.5
+            inc *= 180 / np.pi
+            node *= 180 / np.pi
+            argPeri *= 180 / np.pi
+            Tp += -2400000.5
         elif orbit_format == "KEP":
             q = row["a"] * (1 - row["e"])
             e = row["e"]
             inc = row["inc"]
             node = row["node"]
             argPeri = row["argPeri"]
-            M = row["ma"] * np.pi/180
+            M = row["ma"] * np.pi / 180
             if M > np.pi:
-                M -= 2*np.pi
-            Tp = epochJD_TDB - M* np.sqrt(row["a"] ** 3 / gm_sun) - 2400000.5 # jd to mjd
+                M -= 2 * np.pi
+            Tp = epochJD_TDB - M * np.sqrt(row["a"] ** 3 / gm_sun) - 2400000.5  # jd to mjd
 
         elif orbit_format == "BKEP":
             # need to first go to BCART
@@ -231,10 +235,10 @@ def get_perihelion_row(row, epochJD_TDB, ephem, ssb_dict, gm_sun, gm_total):
                 dz + ssb_vel[2],
                 epochJD_TDB,
             )
-            inc *= 180/np.pi 
-            node *= 180/np.pi 
-            argPeri *= 180/np.pi 
-            Tp += - 2400000.5
+            inc *= 180 / np.pi
+            node *= 180 / np.pi
+            argPeri *= 180 / np.pi
+            Tp += -2400000.5
 
         elif orbit_format == "BCOM":
             # need to first go to BCART
@@ -260,15 +264,22 @@ def get_perihelion_row(row, epochJD_TDB, ephem, ssb_dict, gm_sun, gm_total):
                 dz + ssb_vel[2],
                 epochJD_TDB,
             )
-            inc *= 180/np.pi 
-            node *= 180/np.pi 
-            argPeri *= 180/np.pi 
-            Tp += - 2400000.5
+            inc *= 180 / np.pi
+            node *= 180 / np.pi
+            argPeri *= 180 / np.pi
+            Tp += -2400000.5
 
         else:
             raise ValueError("Provided orbit format not supported.")
     else:
-        q, e, inc, node, argPeri, Tp = row["q"], row["e"], row["inc"], row["node"], row["argPeri"], row["t_p_MJD_TDB"]
+        q, e, inc, node, argPeri, Tp = (
+            row["q"],
+            row["e"],
+            row["inc"],
+            row["node"],
+            row["argPeri"],
+            row["t_p_MJD_TDB"],
+        )
 
     return tuple(np.array([q, e, inc, node, argPeri, Tp]))
 

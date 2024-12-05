@@ -4,7 +4,7 @@ from sorcha.ephemeris.simulation_constants import (
     RADIUS_EARTH_KM,
     SPEED_OF_LIGHT,
     ECL_TO_EQ_ROTATION_MATRIX,
-    EQ_TO_ECL_ROTATION_MATRIX
+    EQ_TO_ECL_ROTATION_MATRIX,
 )
 import spiceypy as spice
 
@@ -25,6 +25,7 @@ def ecliptic_to_equatorial(v, rot_mat=ECL_TO_EQ_ROTATION_MATRIX):
         Rotated vector
     """
     return np.dot(v, rot_mat)
+
 
 def equatorial_to_ecliptic(v, rot_mat=EQ_TO_ECL_ROTATION_MATRIX):
     """

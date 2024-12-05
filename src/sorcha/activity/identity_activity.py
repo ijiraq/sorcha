@@ -53,6 +53,6 @@ class IdentityCometaryActivity(AbstractCometaryActivity):
             Unique identifier for this cometary activity model
         """
         return "identity"
-    
-    def maxBrightness(self, df : pd.DataFrame) -> float:
+
+    def maxBrightness(self, df: pd.DataFrame) -> float:
         return 0

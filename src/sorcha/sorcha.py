@@ -21,7 +21,7 @@ from sorcha.modules import PPAddUncertainties, PPRandomizeMeasurements
 from sorcha.modules import PPVignetting
 from sorcha.modules.PPFadingFunctionFilter import PPFadingFunctionFilter
 from sorcha.modules.PPConfigParser import PPConfigFileParser, PPPrintConfigsToLog, PPFindFileOrExit
-
+from sorcha.modules.PPFirstPassMagnitudeFilter import PPFirstPassMagnitudeFilter
 from sorcha.modules.PPGetLogger import PPGetLogger
 from sorcha.modules.PPCommandLineParser import PPCommandLineParser
 from sorcha.modules.PPMatchPointingToObservations import PPMatchPointingToObservations
@@ -186,6 +186,25 @@ def runLSSTSimulation(args, sconfigs):
         else:
             verboselog("Ingest chunk of orbits")
             orbits_df = reader.read_aux_block(block_size=sconfigs.input.size_serial_chunk)
+
+            if not sconfigs.simulation.brute_force:
+                verboselog("Cutting all objects too faint to be observed")
+                orbits_df = PPFirstPassMagnitudeFilter(
+                    orbits_df,
+                    filterpointing,
+                    sconfigs.filters.mainfilter,
+                    sconfigs.filters.observing_filters,
+                    sconfigs.activity.comet_activity,
+                    sconfigs.activity.lc_model,
+                )
+                if len(orbits_df) == 0:  # the above could feasibly nuke the entire dataframe, so...
+                    pplogger.info(
+                        "WARNING: no objects in this chunk are observable. Skipping to next chunk..."
+                    )
+                    startChunk = startChunk + sconfigs.input.size_serial_chunk
+                    loopCounter = loopCounter + 1
+                    continue
+
             verboselog("Starting ephemeris generation")
             observations = create_ephemeris(orbits_df, filterpointing, args, sconfigs)
             verboselog("Ephemeris generation completed")

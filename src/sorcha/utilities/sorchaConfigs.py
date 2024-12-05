@@ -79,6 +79,9 @@ class simulationConfigs:
     _ephemerides_type: str = None
     """Simulation used for ephemeris input."""
 
+    brute_force: bool = False
+    """brute-force ephemeris generation on all objects without running a first-pass"""
+
     def __post_init__(self):
         """Automagically validates the simulation configs after initialisation."""
         self._validate_simulation_configs()
@@ -110,6 +113,7 @@ class simulationConfigs:
             self.ar_fov_buffer = cast_as_float(self.ar_fov_buffer, "ar_fov_buffer")
             self.ar_picket = cast_as_int(self.ar_picket, "ar_picket")
             self.ar_healpix_order = cast_as_int(self.ar_healpix_order, "ar_healpix_order")
+            self.brute_force = cast_as_bool(self.brute_force, "brute_force")
         elif self._ephemerides_type == "external":
             # makes sure when these are not needed that they are not populated
             check_key_doesnt_exist(self.ar_ang_fov, "ar_ang_fov", "but ephemerides type is external")
@@ -119,6 +123,7 @@ class simulationConfigs:
             check_key_doesnt_exist(
                 self.ar_healpix_order, "ar_healpix_order", "but ephemerides type is external"
             )
+            check_key_doesnt_exist(self.brute_force, "brute_force", "but ephemerides type is external")
 
 
 @dataclass

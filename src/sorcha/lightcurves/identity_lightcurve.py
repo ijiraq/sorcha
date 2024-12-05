@@ -55,5 +55,5 @@ class IdentityLightCurve(AbstractLightCurve):
         """
         return "identity"
 
-    def maxBrightness(self, df : pd.DataFrame) -> float:
+    def maxBrightness(self, df: pd.DataFrame) -> float:
         return 0
